@@ -1,5 +1,5 @@
 /*
-  TasmotaClient.h - Library for microcontrollers enslaved by Tasmota
+  TasmotaClient.h - Library for microcontrollers bound to Tasmota
   
   Copyright (C) 2019  Andre Thomas
   
@@ -21,6 +21,8 @@
 #define __TASMOTACLIENT_H__
 
 #include <Arduino.h>
+
+#include "Print.h"
 
 /*************************************************\
  * TasmotaClient Configuration Defaults
@@ -61,7 +63,7 @@ typedef void (*callbackFunc1) (char*);
  * TasmotaClient Class
 \*************************************************/
 
-class TasmotaClient {
+class TasmotaClient : public Print {
     public:
      char receive_buffer[100];
      // Constructor
@@ -91,6 +93,13 @@ class TasmotaClient {
      // Main client loop which needs to be serviced occasionally to process incoming requests
      void ExecuteCommand(char *cmnd);
      void loop(void);
+
+    // Write a single byte into the packet
+	  virtual size_t write(uint8_t);
+  	// Write size bytes from buffer into the packet
+  	virtual size_t write(const uint8_t *buffer, size_t size);
+    using Print::write; // pull in write(str) and write(buf, size) from Print
+
     private:
      HardwareSerial *serial;
      callbackFunc FUNC_JSON;

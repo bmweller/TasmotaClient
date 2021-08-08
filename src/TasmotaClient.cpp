@@ -124,20 +124,12 @@ void TasmotaClient::sendFeatures(void)
 {
   char buffer[sizeof(Settings)];
   memcpy(&buffer, &Settings, sizeof(Settings));
-  serial->write(char(PARAM_DATA_START));
-  for (uint8_t ca = 0; ca < sizeof(buffer); ca++) {
-    serial->write(char(buffer[ca]));
-  }
-  serial->write(char(PARAM_DATA_END));
+  write(buffer, sizeof(buffer));
 }
 
 void TasmotaClient::sendJSON(char *json)
 {
-  serial->write(char(PARAM_DATA_START));
-  for (uint8_t ca = 0; ca < strlen(json); ca++) {
-    serial->write(json[ca]);
-  }
-  serial->write(char(PARAM_DATA_END));
+  write(json, strlen(json));
 }
 
 void TasmotaClient::attach_FUNC_JSON(callbackFunc func)
@@ -229,31 +221,22 @@ void TasmotaClient::SendCommand(uint8_t cmnd, uint8_t param)
  Command.unused3 = 0;
  uint8_t tmp[sizeof(Command)];
  memcpy(&tmp, &Command, sizeof(Command));
+
  serial->write(char(CMND_START));
- for (uint8_t idx = 0; idx < sizeof(Command); idx++) {
-   serial->write(tmp[idx]);
- }
+ serial->write(tmp, sizeof(Command));
  serial->write(char(CMND_END));
 }
 
 void TasmotaClient::SendTele(char *data)
 {
   SendCommand(CMND_PUBLISH_TELE, strlen(data));
-  serial->write(char(PARAM_DATA_START));
-  for (uint8_t idx = 0; idx < strlen(data); idx++) {
-	  serial->write(data[idx]);
-  }
-  serial->write(char(PARAM_DATA_END));
+  write(data, strlen(data));
 }
 
 void TasmotaClient::ExecuteCommand(char *cmnd)
 {
   SendCommand(CMND_EXECUTE_CMND, strlen(cmnd));
-  serial->write(char(PARAM_DATA_START));
-  for (uint8_t idx = 0; idx < strlen(cmnd); idx++) {
-    serial->write(cmnd[idx]);
-  }
-  serial->write(char(PARAM_DATA_END));
+  write(cmnd, strlen(cmnd));
 }
 
 void TasmotaClient::loop(void)
@@ -268,4 +251,20 @@ void TasmotaClient::loop(void)
         break;
     }
   }
+}
+
+// Write a single byte into the packet
+size_t TasmotaClient::write(uint8_t b)
+{
+  return write(&b, 1);
+}
+
+	// Write size bytes from buffer into the packet
+size_t TasmotaClient::write(const uint8_t *buffer, size_t size)
+{
+  serial->write(char(PARAM_DATA_START));
+  serial->write(buffer, size);
+  serial->write(char(PARAM_DATA_END));
+
+  return size;
 }
