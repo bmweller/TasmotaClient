@@ -95,9 +95,9 @@ class TasmotaClient : public Print {
      void loop(void);
 
     // Write a single byte into the packet
-	  virtual size_t write(uint8_t);
+	  size_t write(uint8_t);
   	// Write size bytes from buffer into the packet
-  	virtual size_t write(const uint8_t *buffer, size_t size);
+  	size_t write(const uint8_t *buffer, size_t size);
     using Print::write; // pull in write(str) and write(buf, size) from Print
 
     private:
