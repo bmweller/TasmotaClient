@@ -106,6 +106,7 @@ class TasmotaClient : public Print
     callbackFunc FUNC_EVERY_SECOND;
     callbackFunc FUNC_EVERY_100_MSECOND;
     callbackFunc1 FUNC_SEND;
+    bool initialized = false;
 };
 
 #endif // __TASMOTACLIENT_H__
